@@ -1,0 +1,28 @@
+import requests
+import tornado.web
+from tornado.escape import json_decode
+
+from repo.AServerDataRepo import AServerDataRepo
+
+
+class DecryptSecretDataHandler(tornado.web.RequestHandler):
+    @property
+    def sqlite_repo(self) -> AServerDataRepo:
+        return self.application.server_data_repo
+
+    def post(self):
+        request = json_decode(self.request.body)
+
+        with requests.Session() as session:
+            session.auth = ("qummy", "GiVEmYsecReT!")
+            response = session.post("http://yarlikvid.ru:9999/api/decrypt", json=request, )
+
+            for encrypted, decrypted in zip(request, response.json()):
+                self.sqlite_repo.add_decrypted(encrypted, decrypted)
+
+            self.set_status(201)
+            self.set_header('Content-Type', 'application/json')
+            self.write(response.text)
+
+
+
