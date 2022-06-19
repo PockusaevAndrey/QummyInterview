@@ -1,8 +1,12 @@
+import json
+
 import requests
 import tornado.web
 from tornado.escape import json_decode
 
+from config import RemoteServerConfig
 from entity.InterviewResultRequest import InterviewResultRequest
+from handler.ApiUrl import ApiUrl
 from repo.AServerDataRepo import AServerDataRepo
 
 
@@ -14,5 +18,6 @@ class SendInterviewResultHandler(tornado.web.RequestHandler):
     def post(self):
         request = InterviewResultRequest(**json_decode(self.request.body))
         with requests.Session() as session:
-            session.auth = ("qummy", "GiVEmYsecReT!")
-            response = session.post("http://yarlikvid.ru:9999/api/decrypt", json=request.dict())
+            session.auth = RemoteServerConfig.credentials
+            response = session.post(ApiUrl.result, json=request.dict())
+            self.write(json.dumps({"status": "Success"}))

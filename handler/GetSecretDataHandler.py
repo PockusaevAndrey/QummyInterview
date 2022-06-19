@@ -1,6 +1,7 @@
 import requests
 import tornado.web
 
+from handler.ApiUrl import ApiUrl
 from repo.AServerDataRepo import AServerDataRepo
 
 
@@ -11,7 +12,7 @@ class GetSecretDataHandler(tornado.web.RequestHandler):
 
     def get(self):
         with requests.Session() as session:
-            response = session.get("http://yarlikvid.ru:9999/api/top-secret-data")
+            response = session.get(ApiUrl.top_secret_data)
             for encrypted_str in response.json():
                 self.sqlite_repo.add_encrypted(encrypted_str)
 
