@@ -1,4 +1,4 @@
-import requests
+from requests import Session
 import tornado.web
 from tornado.escape import json_decode
 
@@ -15,7 +15,7 @@ class DecryptSecretDataHandler(tornado.web.RequestHandler):
     def post(self):
         request = json_decode(self.request.body)
 
-        with requests.Session() as session:
+        with Session() as session:
             session.auth = RemoteServerConfig.credentials
             response = session.post(ApiUrl.decrypt, json=request)
 
